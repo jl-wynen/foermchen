@@ -7,7 +7,6 @@ pub enum Token {
     Op(char),
     Name(String),
     Number(i32),
-    EOC,
 }
 
 pub struct Lexer<'a> {
@@ -50,19 +49,19 @@ impl<'a> Lexer<'a> {
         self.current
     }
 
-    pub fn next_token(&mut self) -> Result<Token, String> {
+    pub fn next_token(&mut self) -> Result<Option<Token>, String> {
         self.seek_next();
         match self.current {
             '+' | '-' | '*' => {
                 let res = Token::Op(self.current);
                 self.next_char();
-                Ok(res)
+                Ok(Some(res))
             }
-            '0'..='9' => Ok(Token::Number(self.tokenise_number())),
-            '\0' => Ok(Token::EOC),
+            '0'..='9' => Ok(Some(Token::Number(self.tokenise_number()))),
+            '\0' => Ok(None),
             _ => {
                 if part_of_identifier(self.current) {
-                    Ok(Token::Name(self.tokenise_string()))
+                    Ok(Some(Token::Name(self.tokenise_string())))
                 } else {
                     Err("Unknown token".to_owned())
                 }
