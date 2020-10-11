@@ -1,3 +1,5 @@
+use std::str::Chars;
+
 use unic_ucd_ident::is_xid_start;
 
 #[derive(Debug)]
@@ -8,18 +10,15 @@ pub enum Token {
     EOC,
 }
 
-pub struct Lexer<T: Iterator<Item = char>> {
-    chars: T,
+pub struct Lexer<'a> {
+    chars: Chars<'a>,
     current: char,
 }
 
-impl<T> Lexer<T>
-where
-    T: Iterator<Item = char>,
-{
-    pub fn new(code: T) -> Self {
+impl<'a> Lexer<'a> {
+    pub fn new(code: &'a str) -> Self {
         let mut lexer = Self {
-            chars: code,
+            chars: code.chars(),
             current: '\0',
         };
         lexer.current = match lexer.chars.next() {
